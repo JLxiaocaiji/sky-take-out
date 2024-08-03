@@ -1,0 +1,115 @@
+1. 初始项目的整体结构
+- sky-take-out: maven父工程，统一管理依赖版本，聚合其他子模块;
+- sky-common: 子模块，存放公共类，例如：工具类、常量类、异常类等;
+- sky-pojo: 子模块，存放实体类、VO、DTO等
+```
+Entity: 实体，通常和数据库中的表对应;
+DTO: 数据传输对象，通常用于程序中各层之间传递数据;
+VO: 视图对象，为前端展示数据提供的对象;
+POJO: 普通Java对象，只有属性和对应的getter和setter
+```
+- sky-server: 子模块，后端服务，存放配置文件、Controller、Service、Mapper等 ;
+
+sky-common 子模块中存放的是一些公共类，可以供其他模块使用
+
+
+##### 各种注解
+1. @ExceptionHandler 注解；https://blog.csdn.net/lkforce/article/details/98494922
+@ExceptionHandler注解中可以添加参数，参数是某个异常类的class，代表这个方法专门处理该类异常
+@ExceptionHandler(NumberFormatException.class)
+
+2.@RestControllerAdvice  https://blog.csdn.net/wenxuankeji/article/details/136544500
+组合注解，它结合了 @ControllerAdvice 和 @ResponseBody 的功能，@ControllerAdvice 使得这个类成为全局异常处理器，适用于所有带有 @Controller 或 @RestController 注解的控制器。@ResponseBody 注解则表示返回值将直接写入HTTP响应体中
+
+3.@Data   
+@Data 注解，自动提供类的get、set、equals、hashCode、canEqual、toString方法
+
+4.@Component
+@Component： 标注Spring管理的Bean，使用@Component注解在一个类上，表示将此类标记为Spring容器中的一个Bean。
+使用 @Component 注解，可以简化组件的注册过程，Spring容器会自动扫描带有此注解的类，并将其作为Bean管理
+包括：
+@Target({ElementType.TYPE}) // 用于指定被修饰的注解可以应用于哪些Java语言元素上, {ElementType.TYPE} 是一个枚举值，它表示注解可以应用于类（Class）、接口（Interface）、枚举（Enum）、注解（Annotation）类型上
+@Retention(RetentionPolicy.RUNTIME) // 用于指定被修饰的注解在Java编译过程中的保留策略,RetentionPolicy.RUNTIME 是一个枚举值，它表示注解将在Java运行时被保留，这意味着JVM（Java虚拟机）在运行时可以读取这些注解
+@Documented // 是一个标记注解,被标记为 @Documented 时，它会被Java编译器保留在生成的Java类文件中，并且会被Javadoc工具提取并在生成的文档中显示
+@Indexed    // 被标记为 @Indexed 时,指示Spring Data Elasticsearch应该将该实体或字段的数据索引到Elasticsearch搜索引擎中
+
+5.@ConfigurationProperties  https://blog.csdn.net/skh2015java/article/details/120141409
+用于将一个类中的属性与外部配置文件（如 application.properties 或 application.yml）中的属性关联起来,通常与 @Component 注解一起使用，以便将配置类作为一个Bean注册到Spring容器中
+```
+@Component
+@ConfigurationProperties(prefix = "app")
+public class AppProperties {
+}
+AppProperties 类被标记为 @ConfigurationProperties，并且指定了前缀为 “app”。这意味着在 application.properties 或 application.yml 文件中，任何以 “app.” 开头的属性都会被绑定到 AppProperties 类中的相应字段上
+```
+
+6.lombok中的 @Builder 自动生成 Builder 类来创建对象 https://blog.csdn.net/a648119398/article/details/120513865
+```
+// builder 设置默认值
+@Builder.Default
+private String email = "default@example.com";
+```
+
+7.@ApiModel swagger注解
+是一个注解，它用于标记一个类，表示该类描述了一个API模型。这个注解通常与 @ApiModelProperty 一起使用，后者用于标记类中的属性，并提供有关该属性的额外元数据，如描述、示例、示例值等
+```
+@ApiModel("用户信息")
+public class User {
+    @ApiModelProperty("用户ID")
+    private String id;
+    @ApiModelProperty("用户名")
+    private String username;
+    @ApiModelProperty("用户姓名")
+    private String name;
+}
+```
+
+8.@Bean
+该对象应该被视为Spring容器中的bean。这意味着Spring容器会管理这个对象的创建、配置和生命周期
+注意点：
+    1.在方法上使用@Bean注解，Spring容器会调用这个方法来创建bean的实例
+    2.Spring容器负责管理@Bean注解标记的方法所创建的bean的整个生命周期，包括初始化和销毁
+
+
+9.@RequestBody
+JSON数据键名与形参对象属性名相同，定义 POJO 类型形参可接受参数，需使用 @RequestBody 标识
+@RequestBody注解用于处理HTTP请求体中的内容,将HTTP请求体中的数据自动绑定到方法的参数;必须有一个非空的请求体，否则 Spring MVC将抛出异常
+
+10.@RestController
+@RestController 用于创建RESTful风格的Web服务的控制器类, 相当于@Controller和@ResponseBody的合体
+1.@RestController注解默认包含@ResponseBody注解，这意味着方法返回值会自动序列化为JSON或XML并写入HTTP响应体
+2.@RestController类可以包含多个请求映射方法，每个方法都可以返回一个对象，Spring会自动处理对象的序列化
+3.@RestController类通常需要与Spring的Web组件（如Spring MVC）一起使用，并需要被包含在Spring的组件扫描范围内
+
+11.@Aspect  定义一个切面(Aspect)
+@Aspect注解的类通常包含一个或多个切入点（Pointcut）定义，这些切入点定义了哪些方法应该被拦截和增强。此外，切面还可以包含建议（Advice），如前置通知（Before）、后置通知（After）、环绕通知（Around）、异常通知（AfterThrowing）和最终通知（AfterReturning）
+
+12.@Pointcut() 切面中切入点表达式
+@Pointcut 注解用于定义切入点，它是AOP（面向切面编程）的基础。切入点定义了哪些方法应该被拦截和增强
+
+13.@annotation  @annotation 通常用于表示一个注解，@annotation作为切入点表达式的一部分
+@annotation(com.sky.annotation.AutoFill)：这个条件匹配所有带有com.sky.annotation.AutoFill注解的方法
+
+14.@Around:环绕通知，此注解标注的通知方法在目标方法前、后都被执行
+15.@Before:前置通知，此注解标注的通知方法在目标方法前被执行
+16.@After :后置通知，此注解标注的通知方法在目标方法后被执行，无论是否有异常都会执行。
+17.@AfterReturning :返回后通知，此注解标注的通知方法在目标方法后被执行，有异常不会执行
+18.@AfterThrowing :异常后通知，此注解标注的通知方法发生异常后执行
+
+19.@ConfigurationProperties：用于将配置文件(application.properties 或 application.yml)中的属性绑定到一个Java Bean上
+
+20.@ConditionalOnMissingBean: Spring容器中不存在指定类型的Bean时，@ConditionalOnMissingBean 注解会确保被它标注的Bean定义被创建和注册， 通常与 @Bean 注解一起使用
+@ConditionalOnMissingBean 注解可以接受几个参数，以便更精细地控制条件：
+    value：指定需要检查的Bean类型。
+    name：指定需要检查的Bean名称。
+    annotation：指定需要检查的Bean必须具有的注解类型。
+    ignored：指定在检查时应该忽略的Bean类型
+
+21.当涉及到多张表的操作时，要注意事务的一致性, @Transactional ,@Transactional 注解放在任何public方法上，Spring将会在调用该方法时开启一个新的事务，并在方法结束时提交或回滚事务
+@Transactional 注解可以设置属性：
+    1.propagation：定义事务的传播行为，如 REQUIRED（默认值，如果当前没有事务，则创建一个新的事务），REQUIRES_NEW（创建一个新的事务，如果当前已有事务，则挂起当前事务），等等。
+    2.isolation：定义事务的隔离级别，如 READ_COMMITTED（默认值），REPEATABLE_READ，SERIALIZABLE 等。
+    3.timeout：定义事务的超时时间，单位是秒。
+    4.readOnly：表示这个事务只读取数据但不更新数据，这可以作为一个优化，因为只读事务不需要考虑回滚操作。
+    5.rollbackFor：定义哪些异常类型将触发事务回滚。
+    6.noRollbackFor：定义哪些异常类型不会触发事务回滚。

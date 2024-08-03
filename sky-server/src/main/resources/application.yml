@@ -1,0 +1,46 @@
+server:
+  port: 8080
+
+spring:
+  profiles:
+    active: dev   # 对应 application-dev, 当应用启动时，Spring会加载与 “dev” 配置文件相对应的配置信息
+  main:
+    allow-circular-references: true
+  datasource:
+    druid:
+      driver-class-name: ${sky.datasource.driver-class-name}
+      url: jdbc:mysql://${sky.datasource.host}:${sky.datasource.port}/${sky.datasource.database}?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
+      username: ${sky.datasource.username}
+      password: ${sky.datasource.password}
+
+mybatis:
+  #mapper配置文件
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.sky.entity
+  configuration:
+    #开启驼峰命名
+    map-underscore-to-camel-case: true
+
+logging:
+  level:
+    com:
+      sky:
+        mapper: debug
+        service: info
+        controller: info
+
+sky:
+  jwt:
+    # 设置jwt签名加密时使用的秘钥
+    admin-secret-key: itcast
+    # 设置jwt过期时间
+    admin-ttl: 7200000
+    # 设置前端传递过来的令牌名称
+    admin-token-name: token
+
+  # 阿里云配置, 具体参见 sky-common ---> properties ---> AliOssProperties
+#  #alioss:
+#    #endpoint: ${sky.alioss.endpoint}  # 开发时使用 application-dev 中的属性值, 并调用 sky-common ---> utils ---> AliOssUtil
+#    #access-key-id: ${sky.alioss.access-key-id}
+#    #access-key-secret: ${sky.alioss.access-key-secret}
+#    #bucket-name: ${sky.alioss.bucket-name} # 存储空间（Bucket）的名称
