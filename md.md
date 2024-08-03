@@ -113,3 +113,22 @@ JSON数据键名与形参对象属性名相同，定义 POJO 类型形参可接�
     4.readOnly：表示这个事务只读取数据但不更新数据，这可以作为一个优化，因为只读事务不需要考虑回滚操作。
     5.rollbackFor：定义哪些异常类型将触发事务回滚。
     6.noRollbackFor：定义哪些异常类型不会触发事务回滚。
+
+22. @Nullable 是一个注解，用于指示一个字段、方法参数或返回值可能为 null
+```
+@Nullable
+private String nullableField;  # 表示字段可能被赋值为 null
+```
+```
+# 可以接受 null 作为参数
+public void setNullableField(@Nullable String nullableField) {
+    this.nullableField = nullableField;
+}
+```
+```
+# 方法可能返回 null
+@Nullable
+public String getNullableField() {
+    return nullableField;
+}
+```
