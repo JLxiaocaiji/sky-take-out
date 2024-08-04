@@ -62,4 +62,109 @@ DEL key 		    # 该命令用于在 key 存在是删除 key
 编写配置类，创建RedisTemplate对象
 通过RedisTemplate对象操作Redis
 
-# 进度 p60
+8. String 示例
+```
+// set
+redisTemplate.opsForValue().set("city", "北京");
+// GET
+String city = (String) redisTemplate.opsForValue().get("city");
+System.out.println(city);
+// SETEX 命令
+redisTemplate.opsForValue().set("code", "1", 3, TimeUnit.MINUTES);
+
+// SETNX 命令
+// 在此传入的是 obj 类型，传入的对象是 value 这个参数， 给任意对象都会转化为 String
+redisTemplate.opsForValue().setIfAbsent("lock", "1");   // 成功
+redisTemplate.opsForValue().setIfAbsent("lock", "2");   // 失败
+```
+
+9. List
+```
+// List 操作
+ListOperations listOperations = redisTemplate.opsForList();
+
+// LPUSH key value1 [value2]
+listOperations.leftPushAll("mylist", "1", "2", "3");
+listOperations.leftPushAll("mylist", "4");
+
+// LRANGE key start stop
+List mylist = listOperations.range("mylist", 0, -1);
+System.out.println(mylist);
+
+// RPOP key
+listOperations.rightPop("mylist");
+
+// LLEN key
+Long size = listOperations.size("mylist");
+System.out.println(size);
+```
+
+10. Set
+```
+// 集合 没有重复元素
+SetOperations setOperations = redisTemplate.opsForSet();
+
+// SADD key member1 [member2]
+setOperations.add("set1", "a", "b");
+setOperations.add("set1", "c", "d");
+
+// SMEMBERS key
+Set members = setOperations.members("set1");
+System.out.println(members);
+
+// SCARD key
+Long size = setOperations.size("set1");
+System.out.println(size);
+
+// SINTER key1 [key2]
+Set intersect = setOperations.intersect("set1", "set2");
+System.out.println(intersect);
+
+// SUNION key1 [key2]
+Set union = setOperations.union("set1", "set2");
+System.out.println(union);
+
+// SREM key member1 [member2]
+setOperations.remove("set1", "set2");
+```
+
+11. Zset
+```
+// Zset 有序集合
+ZSetOperations zSetOperations = redisTemplate.opsForZSet();
+
+// ZADD key score1 member1 [score2 member2]
+zSetOperations.add("zset1", "a", 1);
+zSetOperations.add("zset1", "b", 2);
+zSetOperations.add("zset1", "c", 3);
+
+// ZRANGE key start stop [WITHSCORES]
+Set zset1 = zSetOperations.range("zset1", 0, -1);
+System.out.println(zset1);
+
+// ZINCRBY key increment member
+zSetOperations.incrementScore("zset1", "c", 10);
+
+// ZREM key member [member ...]
+zSetOperations.remove("zset1", "a", "b");
+```
+
+12. 常用命令
+```
+// KEYS pattern 
+Set keys = redisTemplate.keys("*");
+System.out.println(keys);
+
+// EXISTS key
+Boolean name = redisTemplate.hasKey("name");
+Boolean set1 = redisTemplate.hasKey("set1");
+
+for ( Object key : keys) {
+    // TYPE key 
+    DataType type = redisTemplate.type("name");
+    System.out.println(type.name());
+}
+
+// DEL key 
+redisTemplate.delete("mylist");
+```

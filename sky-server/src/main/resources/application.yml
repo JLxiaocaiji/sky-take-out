@@ -14,10 +14,10 @@ spring:
       password: ${sky.datasource.password}
 
   redis:
-    host: ${sky.reids.host}
-    port: ${sky.reids.port}
-#    password: ${sky.reids.password}
-#    database: ${sky.reids.database}       # 总共 0-15 共16个库，默认 0
+    host: ${sky.redis.host}
+    port: ${sky.redis.port}
+    password: ${sky.redis.password}
+    database: ${sky.redis.database:0}       # 总共 0-15 共16个库，默认 0
 
 mybatis:
   #mapper配置文件
