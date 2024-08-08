@@ -12,3 +12,7 @@ sky:
     port: 6379
 #    password:
 #    database:        # 总共 0-15 共16个库，默认 0
+
+  wechat:
+    appid: "***"
+    secret: "***"

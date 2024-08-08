@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
  */
 
 @Target(ElementType.METHOD) // 定义一个可以用于方法的注解
-public @interface AutoFill {
+public @interface AutoFill {    // 该自定义注解自动填充时间，创建人，更新人
     // 需要一个属性来指定当前数据库操作类型
     // 数据库操作类型， UPDATE, INSERT
     OperationType value();  // 返回枚举常量（enum constant）的值

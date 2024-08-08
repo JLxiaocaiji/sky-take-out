@@ -44,9 +44,22 @@ sky:
     # 设置前端传递过来的令牌名称
     admin-token-name: token
 
+    # jwt 签名加密时使用的密钥
+    user-secret-key: itest
+
+    # jwt 过期时间
+    user-ttl: 7200000
+
+    # 前端传递过来的令牌名称
+    user-token-name: authentication
+
   # 阿里云配置, 具体参见 sky-common ---> properties ---> AliOssProperties
 #  #alioss:
 #    #endpoint: ${sky.alioss.endpoint}  # 开发时使用 application-dev 中的属性值, 并调用 sky-common ---> utils ---> AliOssUtil
 #    #access-key-id: ${sky.alioss.access-key-id}
 #    #access-key-secret: ${sky.alioss.access-key-secret}
 #    #bucket-name: ${sky.alioss.bucket-name} # 存储空间（Bucket）的名称
+
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
