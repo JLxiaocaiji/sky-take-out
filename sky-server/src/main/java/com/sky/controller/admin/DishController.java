@@ -11,10 +11,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -24,6 +26,9 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     /**
      * 新增菜品
      * @param dishDTO
@@ -32,6 +37,12 @@ public class DishController {
     public Result save(@RequestBody DishDTO dishDTO) {
 
         dishService.saveWithFlavor(dishDTO);
+
+        // 清理缓存数据
+        String key = "dish_" + dishDTO.getCategoryId();
+        // redis 删除
+        redisTemplate.delete(key);
+
         return Result.success();
     }
 
@@ -108,5 +119,10 @@ public class DishController {
     public Result<List<Dish>> list(Long categoryId) {
         List<Dish> dishList = dishService.list(categoryId);
         return Result.success(dishList);
+    }
+
+    private void cleanCache(String pattern) {
+        Set keys = redisTemplate.keys(pattern);
+        redisTemplate.delete(keys);
     }
 }

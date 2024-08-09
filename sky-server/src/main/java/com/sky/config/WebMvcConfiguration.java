@@ -103,7 +103,9 @@ class WebMvcConfiguration extends WebMvcConfigurationSupport {
      * @param registry
      */
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // 将访问路径 "/doc.html" 映射到类路径下的 "classpath:/META-INF/resources/" 目录
         registry.addResourceHandler("/doc.html").addResourceLocations("classpath:/META-INF/resources/");
+        // 将访问路径 "/webjars/**" 映射到类路径下的 "classpath:/META-INF/resources/webjars/" 目录
         registry.addResourceHandler("/webjars/**").addResourceLocations("classpath:/META-INF/resources/webjars/");
     }
 

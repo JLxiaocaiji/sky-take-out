@@ -168,3 +168,28 @@ for ( Object key : keys) {
 // DEL key 
 redisTemplate.delete("mylist");
 ```
+
+13. redis 清理
+- 1.单个清理
+```
+@Autowired
+private RedisTemplate redisTemplate
+String key = "dish_" + dishDTO.getCategoryId();
+redisTemplate.delete(key)
+```
+- 2.批量清理
+```
+// 将所有菜品缓存清楚，所有 dish_ 开头的 key
+Set key = redisTemplate.keys("dish_")
+redisTemplate.delete(keys)
+
+
+// 可构造私有方法
+private void cleanCache(String pattern) {
+    Set keys = redisTemplate.keys(pattern);
+    redisTemplate.delete(keys);
+}
+```
+
+14. Spring Cache
+    key 属性定义了缓存的键。这里使用了 SpEL 表达式 #user.id，它表示使用方法的 user 参数的 id 属性作为缓存键

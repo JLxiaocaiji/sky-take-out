@@ -81,3 +81,23 @@ public void testPOST() throws Exception {
     httpClient.close();
 }
 ```
+
+5. Spring Cache
+是一个框架，实现了基于注解的缓存功能，只需要简单地加一个注解，就能实现缓存功能;提供了一层抽象，底层可以切换不同的缓存实现
+5.1 @EnableCaching：开启缓存注解功能，通常加在启动类上
+5.2 @Cacheable：在方法执行前先查询缓存中是否有数据，如果有数据，则直接返回缓存数据；如果没有缓存数据，调用方法并将方法返回值放到缓存中
+5.3 @CachePut: 将方法的返回值放到缓存中; 
+```
+@CachePut(value = "userCache", key = "#user.id")    // 动态获取到 user.id 的字段值，最后会生成 userCache::user
+public User updateUser(User user) {     // 这里的 形参 user 和 #user.id 的 user 保持一致
+    // 更新用户信息的逻辑
+    return userRepository.save(user);
+}
+value 属性指定了缓存名称
+key 属性定义了缓存的键。这里使用了 SpEL 表达式 #user.id，它表示使用方法的 user 参数的 id 属性作为缓存键
+```
+
+5.4 @CacheEvict: 将一条或多条数据从缓存中删除
+
+
+
