@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 // 如果直接使用 ShopController 会报错： bean 命名冲突
 @RestController("userShopController")
 @Slf4j
-@RequestMapping("/admin/shop")
+@RequestMapping("/user/shop")
 @Api(tags = "店铺相关接口")
 public class ShopController {
     // 定义字符串常量

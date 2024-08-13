@@ -61,4 +61,4 @@ public class User {
 }
 ```
 
-
+swagger 默认地址是 http://localhost:8080/doc.html#/home

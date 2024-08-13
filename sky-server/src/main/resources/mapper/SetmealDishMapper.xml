@@ -9,4 +9,14 @@
             #{dishId}
         </foreach>
     </select>
+
+<!--    parameterType="list"：指定了传递给这个 SQL 语句的参数类型是一个列表-->
+    <insert id="batchInsert" parameterType="list">
+        insert into setmeal_dish
+        (setmeal_id, dish_id, name, price, copies)
+        values
+        <foreach collection="setmealDishes" item="sd" separator="," >
+            (#{sd.setmealId, #{sd.dishId}, #{sd.name}, #{sd.price}, #{sd.copies})
+        </foreach>
+    </insert>
 </mapper>
