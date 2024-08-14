@@ -41,6 +41,7 @@ public class CategoryServiceImpl implements CategoryService {
      * 新增分类
      * @param categoryDTO
      */
+    @Override
     public void save(CategoryDTO categoryDTO) {
         Category category = new Category();
         // 属性拷贝

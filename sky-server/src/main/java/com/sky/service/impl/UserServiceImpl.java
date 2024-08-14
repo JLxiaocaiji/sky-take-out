@@ -34,6 +34,7 @@ public class UserServiceImpl implements UserService {
      * @param userLoginDTO
      * @return
      */
+    @Override
     public User wxLogin(UserLoginDTO userLoginDTO) {
 
         String openid = getOpenid(userLoginDTO.getCode());
