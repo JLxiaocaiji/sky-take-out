@@ -132,6 +132,7 @@ public class WeChatPayUtil {
      * @return
      */
     private String jsapi(String orderNum, BigDecimal total, String description, String openid) throws Exception {
+        // 微信支付必要参数, 聚合到 jsonObject 中
         JSONObject jsonObject = new JSONObject();
         jsonObject.put("appid", weChatProperties.getAppid());
         jsonObject.put("mchid", weChatProperties.getMchid());
@@ -140,6 +141,9 @@ public class WeChatPayUtil {
         jsonObject.put("notify_url", weChatProperties.getNotifyUrl());
 
         JSONObject amount = new JSONObject();
+        // multiply(new BigDecimal(100));    将total乘以100;
+        // setScale(2, BigDecimal.ROUND_HALF_UP);   设置小数点后保留两位数字，并且使用“四舍五入”的舍入模式
+        // intValue();   将BigDecimal转换为整数
         amount.put("total", total.multiply(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP).intValue());
         amount.put("currency", "CNY");
 
@@ -170,9 +174,13 @@ public class WeChatPayUtil {
         JSONObject jsonObject = JSON.parseObject(bodyAsString);
         System.out.println(jsonObject);
 
+        // 获得 微信 反馈的 prePayId
         String prepayId = jsonObject.getString("prepay_id");
+
+        // 封装一系列数据进行加密
         if (prepayId != null) {
             String timeStamp = String.valueOf(System.currentTimeMillis() / 1000);
+            // 生成一个随机的数字字符串,该这个方法通常用于生成安全的随机数
             String nonceStr = RandomStringUtils.randomNumeric(32);
             ArrayList<Object> list = new ArrayList<>();
             list.add(weChatProperties.getAppid());
@@ -184,6 +192,7 @@ public class WeChatPayUtil {
             for (Object o : list) {
                 stringBuilder.append(o).append("\n");
             }
+            // 签名
             String signMessage = stringBuilder.toString();
             byte[] message = signMessage.getBytes();
 
