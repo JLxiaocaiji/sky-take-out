@@ -23,3 +23,6 @@ sky:
     weChatPayCertFilePath: "***"
     notifyUrl: "***"
     refundNotifyUrl: "***"
+
+  baidu:
+    ak: "*****"
