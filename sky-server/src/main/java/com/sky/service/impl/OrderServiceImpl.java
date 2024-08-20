@@ -21,6 +21,7 @@ import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 //import com.sky.websocket.WebSocketServer;
 
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +64,9 @@ public class OrderServiceImpl implements OrderService {
 
     // 微信支付
     private WeChatPayUtil weChatPayUtil;
+
+    // websocket 推送消息
+    private WebSocketServer webSocketServer;
 
     /**
      * 用户下单
@@ -201,11 +205,13 @@ public class OrderServiceImpl implements OrderService {
         // 通过websocket通知商家
         Map<String, Object> map = new HashMap<>();
         // 1:来单通知
-        map.put("type", 1);
+        map.put("type", 1);     // 1:来电提醒; 2:客户催单
         map.put("orderId", ordersDB.getId());
         map.put("content", "订单号：" + outTradeNo);
         String msg = JSONObject.toJSONString(map);
-//        webSocketServer.sendToAllClient(msg);
+
+        // 注意此 server 中的 sessionMap
+        webSocketServer.sendToAllClient(msg);
     }
 
     /**
@@ -530,10 +536,11 @@ public class OrderServiceImpl implements OrderService {
 
         // 基于WebSocket实现催单
         Map<String, Object> map = new HashMap<>();
-        map.put("type", 2);
+        map.put("type", 2);     // 1. 来电提醒; 2. 催单
         map.put("orderId", id);
         map.put("content", "订单号：" + order.getNumber());
-//        webSocketServer.sendToAllClient(JSON.toJSONString(map))
+
+        webSocketServer.sendToAllClient(JSON.toJSONString(map));
     }
 
     /**
