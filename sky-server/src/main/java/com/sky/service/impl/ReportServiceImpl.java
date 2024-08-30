@@ -5,16 +5,21 @@ import com.sky.entity.Orders;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
-import com.sky.vo.OrderReportVO;
-import com.sky.vo.SalesTop10ReportVO;
-import com.sky.vo.TurnoverReportVO;
-import com.sky.vo.UserReportVO;
+import com.sky.service.WorkSpaceService;
+import com.sky.vo.*;
 import io.swagger.annotations.ApiOperation;
 import org.apache.poi.util.StringUtil;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.apache.commons.lang.StringUtils;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -32,6 +37,9 @@ public class ReportServiceImpl implements ReportService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private WorkSpaceService workSpaceService;
 
     /**
      * 营业额统计
@@ -219,6 +227,83 @@ public class ReportServiceImpl implements ReportService {
                 .nameList(nameList)
                 .numberList(numberList)
                 .build();
+    }
+
+    /**
+     * 报表导出功能
+     * @param response
+     */
+    @Override
+    public void exportBusinessData(HttpServletResponse response) {
+        // 1.查询数据库，获取近30天营业数据
+        LocalDate dateBegin = LocalDate.now().minusDays(30);
+        LocalDate dateEnd = LocalDate.now().minusDays(1);
+
+        // LocalDateTime.of(dateBegin, LocalTime.MIN) // 普通年月日带上 时分秒
+        BusinessDataVO businessDataVO = workSpaceService.getBusinessData(LocalDateTime.of(dateBegin, LocalTime.MIN), LocalDateTime.of(dateEnd, LocalTime.MAX));
+
+
+        /**
+         * 2 .通过 POI 写入 excel 文件
+         */
+        // this.getClass(); // 获取类对象
+        // getClassLoader(); // 返回一个 ClassLoader 对象，这是用于加载指定类的类加载器
+        // getResourceAsStream();   // 从此类路径下来读取资源，返回一个 InputStream 对象，如果找不到资源则返回 null
+        // ("template/运营数据报表模板");    // 在 template 目录下的 运营数据报表模板 文件
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板");
+
+
+        try {
+            XSSFWorkbook excel = new XSSFWorkbook(in);
+
+            // 获取标签为 “” 的 sheet
+            XSSFSheet sheet = excel.getSheet("sheet1");
+
+            // 获取 sheet1 中的第二行，第二列并设值
+            sheet.getRow(1).getCell(1).setCellValue("时间：" + dateBegin + "至" + dateEnd);
+
+            // 获得第 4 行，第 3 列并设值
+            XSSFRow row = sheet.getRow(3);
+            row.getCell(2).setCellValue(businessDataVO.getTurnover());
+            row.getCell(4).setCellValue(businessDataVO.getOrderCompletionRate());
+            row.getCell(6).setCellValue(businessDataVO.getNewUsers());
+
+            // 获得第 5 行
+            row = sheet.getRow(4);
+            row.getCell(2).setCellValue(businessDataVO.getValidOrderCount());
+            row.getCell(4).setCellValue(businessDataVO.getUnitPrice());
+
+
+            // 填充明细数据
+            for ( int i = 0; i < 30; i++) {
+                LocalDate date = dateBegin.plusDays(i);
+                // 查询某一天数据
+                BusinessDataVO businessData = workSpaceService.getBusinessData(LocalDateTime.of(date, LocalTime.MIN), LocalDateTime.of(date, LocalTime.MAX));
+
+                // 获得当前天的下一天
+                row = sheet.getRow( 7 + i);
+                row.getCell(1).setCellValue(date.toString());
+                row.getCell(2).setCellValue(businessData.getTurnover());
+                row.getCell(3).setCellValue(businessData.getValidOrderCount());
+                row.getCell(4).setCellValue(businessData.getOrderCompletionRate());
+                row.getCell(5).setCellValue(businessData.getUnitPrice());
+                row.getCell(6).setCellValue(businessData.getNewUsers());
+            }
+
+            /**
+             * 3.通过输出流下载到浏览器
+             */
+            ServletOutputStream out = response.getOutputStream();
+            excel.write(out);
+
+            /**
+             * 关闭资源
+             */
+            out.close();
+            excel.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     private Integer getOrderCount(LocalDateTime beginTime, LocalDateTime endTime, Integer status) {
