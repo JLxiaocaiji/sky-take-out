@@ -250,7 +250,7 @@ public class ReportServiceImpl implements ReportService {
         // getClassLoader(); // 返回一个 ClassLoader 对象，这是用于加载指定类的类加载器
         // getResourceAsStream();   // 从此类路径下来读取资源，返回一个 InputStream 对象，如果找不到资源则返回 null
         // ("template/运营数据报表模板");    // 在 template 目录下的 运营数据报表模板 文件
-        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板");
+        InputStream in = this.getClass().getClassLoader().getResourceAsStream("template/运营数据报表模板.xlsx");
 
 
         try {
